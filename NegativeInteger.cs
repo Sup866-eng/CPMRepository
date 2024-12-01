@@ -26,7 +26,7 @@ public class NegativeInteger
         if (number < 0)
         {
             _number = number;
-            Console.WriteLine($"Значение установлено на: {number}");
+            Console.WriteLine($"Значение : {number}");
         }
         else
         {
