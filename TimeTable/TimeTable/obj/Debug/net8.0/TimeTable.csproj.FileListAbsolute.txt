@@ -1,0 +1,14 @@
+C:\Личные папки\10 Класс\HomeWork\TimeTable\TimeTable\obj\Debug\net8.0\TimeTable.GeneratedMSBuildEditorConfig.editorconfig
+C:\Личные папки\10 Класс\HomeWork\TimeTable\TimeTable\obj\Debug\net8.0\TimeTable.AssemblyInfoInputs.cache
+C:\Личные папки\10 Класс\HomeWork\TimeTable\TimeTable\obj\Debug\net8.0\TimeTable.AssemblyInfo.cs
+C:\Личные папки\10 Класс\HomeWork\TimeTable\TimeTable\obj\Debug\net8.0\TimeTable.csproj.CoreCompileInputs.cache
+C:\Личные папки\10 Класс\HomeWork\TimeTable\TimeTable\bin\Debug\net8.0\TimeTable.exe
+C:\Личные папки\10 Класс\HomeWork\TimeTable\TimeTable\bin\Debug\net8.0\TimeTable.deps.json
+C:\Личные папки\10 Класс\HomeWork\TimeTable\TimeTable\bin\Debug\net8.0\TimeTable.runtimeconfig.json
+C:\Личные папки\10 Класс\HomeWork\TimeTable\TimeTable\bin\Debug\net8.0\TimeTable.dll
+C:\Личные папки\10 Класс\HomeWork\TimeTable\TimeTable\bin\Debug\net8.0\TimeTable.pdb
+C:\Личные папки\10 Класс\HomeWork\TimeTable\TimeTable\obj\Debug\net8.0\TimeTable.dll
+C:\Личные папки\10 Класс\HomeWork\TimeTable\TimeTable\obj\Debug\net8.0\refint\TimeTable.dll
+C:\Личные папки\10 Класс\HomeWork\TimeTable\TimeTable\obj\Debug\net8.0\TimeTable.pdb
+C:\Личные папки\10 Класс\HomeWork\TimeTable\TimeTable\obj\Debug\net8.0\TimeTable.genruntimeconfig.cache
+C:\Личные папки\10 Класс\HomeWork\TimeTable\TimeTable\obj\Debug\net8.0\ref\TimeTable.dll
