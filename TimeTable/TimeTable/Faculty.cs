@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace TimeTable
 {
-    internal class Faculty: IComparable<Faculty>
-    {   
+    internal class Faculty : IComparable<Faculty>
+    {
         public string Name { get; set; }
         public int Hours { get; set; }
-        public string Teacher { get; set; }
+        public Teacher Teacher { get; set; }
 
         public int Complex { get; set; }
 
@@ -28,7 +28,7 @@ namespace TimeTable
             this.Teacher = null;
             this.Complex = complex;
         }
-        public Faculty(string name, int hours, string teacher, int complex)
+        public Faculty(string name, int hours, Teacher teacher, int complex)
         {
             this.Name = name;
             this.Hours = hours;

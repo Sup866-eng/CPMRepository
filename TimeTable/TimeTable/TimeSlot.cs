@@ -6,11 +6,13 @@ using System.Threading.Tasks;
 
 namespace TimeTable
 {
-    internal class FacultyComparer : IComparer<Faculty>
+    class TimeSlot
     {
-        public int Compare(Faculty fac1, Faculty fac2)
+        public string Time { get; set; }
+
+        public TimeSlot(string time)
         {
-            return fac1.Complex.CompareTo(fac2.Complex);
+            Time = time;
         }
     }
 }

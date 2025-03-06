@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TimeTable
 {
-    internal class FacultyStorageEnumerator: IEnumerator<Faculty>
+    internal class FacultyStorageEnumerator : IEnumerator<Faculty>
     {
         private readonly Faculty[] faculties;
         private int currentIndex = -1;

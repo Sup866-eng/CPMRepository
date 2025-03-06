@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TimeTable
 {
-    internal class DayStorageEnumerator:IEnumerator<Day>
+    internal class DayStorageEnumerator : IEnumerator<Day>
     {
         private readonly Day[] days;
         private int currentIndex = -1;
