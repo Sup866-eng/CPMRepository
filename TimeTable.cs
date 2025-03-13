@@ -4,58 +4,80 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+// WeekDay class
 public class WeekDay : IEnumerable<string>
 {
-    private static readonly List<string> Days = new() { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
-    public IEnumerator<string> GetEnumerator() => Days.GetEnumerator();
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    private static readonly List<string> Days = new List<string> { "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
 
-    public bool Contains(string day) => Days.Any(d => d.Equals(day, StringComparison.OrdinalIgnoreCase));
-    public string GetFormattedDay(string day) => Days.FirstOrDefault(d => d.Equals(day, StringComparison.OrdinalIgnoreCase)) ?? day;
+    public IEnumerator<string> GetEnumerator()
+    {
+        return Days.GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    public bool Contains(string day)
+    {
+        foreach (string d in Days)
+        {
+            if (d.Equals(day, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public string GetFormattedDay(string day)
+    {
+        foreach (string d in Days)
+        {
+            if (d.Equals(day, StringComparison.OrdinalIgnoreCase))
+            {
+                return d;
+            }
+        }
+        return day;
+    }
 }
 
+// Lesson class
 public class Lesson : IComparable<Lesson>
 {
     public string Name { get; set; }
     public string Teacher { get; set; }
     public int Difficulty { get; set; } // Lesson difficulty from 1 to 10
-    public TimeSpan Duration { get; set; }
+    public TimeSpan StartTime { get; set; }
+    public TimeSpan EndTime { get; set; }
 
-    public Lesson(string name, string teacher, int difficulty, TimeSpan duration)
+    public Lesson(string name, string teacher, int difficulty, TimeSpan startTime)
     {
-        if (duration.TotalMinutes != 45)
-            throw new ArgumentException("Lesson must be exactly 45 minutes long.");
-
         Name = name;
         Teacher = teacher;
         Difficulty = difficulty;
-        Duration = duration;
+        StartTime = startTime;
+        EndTime = startTime.Add(TimeSpan.FromMinutes(45));
     }
 
     public int CompareTo(Lesson other)
     {
-        return other.Difficulty.CompareTo(this.Difficulty); // Sorting by descending difficulty
+        return StartTime.CompareTo(other.StartTime);
     }
 }
 
-public class LessonTime
-{
-    public string Time { get; set; }
-    public LessonTime(string time)
-    {
-        Time = time;
-    }
-}
-
+// Schedule class
 public class Schedule
 {
-    private Dictionary<string, List<(LessonTime, Lesson)>> schedule;
+    private Dictionary<string, List<Lesson>> schedule;
     private string filePath;
 
     public Schedule(string path)
     {
         filePath = path;
-        schedule = new Dictionary<string, List<(LessonTime, Lesson)>>();
+        schedule = new Dictionary<string, List<Lesson>>();
         LoadFromFile();
     }
 
@@ -66,19 +88,20 @@ public class Schedule
         string currentDay = null;
         foreach (var line in File.ReadLines(filePath))
         {
-            if (new WeekDay().Contains(line))
+            WeekDay weekDay = new WeekDay();
+            if (weekDay.Contains(line))
             {
-                currentDay = new WeekDay().GetFormattedDay(line);
-                schedule[currentDay] = new List<(LessonTime, Lesson)>();
+                currentDay = weekDay.GetFormattedDay(line);
+                schedule[currentDay] = new List<Lesson>();
             }
             else if (currentDay != null)
             {
                 var parts = line.Split(' ');
                 if (parts.Length >= 4 &&
                     int.TryParse(parts[2], out int difficulty) &&
-                    TimeSpan.TryParse(parts[3], out TimeSpan duration))
+                    TimeSpan.TryParse(parts[3], out TimeSpan startTime))
                 {
-                    schedule[currentDay].Add((new LessonTime(parts[0]), new Lesson(parts[1], parts[2], difficulty, duration)));
+                    schedule[currentDay].Add(new Lesson(parts[1], parts[2], difficulty, startTime));
                 }
             }
         }
@@ -86,18 +109,19 @@ public class Schedule
 
     public void DisplaySchedule(string day)
     {
-        day = new WeekDay().GetFormattedDay(day);
+        WeekDay weekDay = new WeekDay();
+        day = weekDay.GetFormattedDay(day);
         if (schedule.ContainsKey(day))
         {
-            Console.WriteLine($"Schedule for {day}:");
+            Console.WriteLine("Schedule for " + day + ":");
             foreach (var lesson in schedule[day])
             {
-                Console.WriteLine($"{lesson.Item1.Time} - {lesson.Item2.Name} (Teacher: {lesson.Item2.Teacher}, Difficulty: {lesson.Item2.Difficulty})");
+                Console.WriteLine(lesson.StartTime + " - " + lesson.EndTime + " " + lesson.Name + " (Teacher: " + lesson.Teacher + ", Difficulty: " + lesson.Difficulty + ")");
             }
         }
         else
         {
-            Console.WriteLine($"No lessons scheduled for {day}.");
+            Console.WriteLine("No lessons scheduled for " + day + ".");
         }
     }
 
@@ -105,9 +129,11 @@ public class Schedule
     {
         Console.WriteLine("Enter the day of the week:");
         string day = Console.ReadLine();
-        day = new WeekDay().GetFormattedDay(day);
 
-        if (!new WeekDay().Contains(day))
+        WeekDay weekDay = new WeekDay();
+        day = weekDay.GetFormattedDay(day);
+
+        if (!weekDay.Contains(day))
         {
             Console.WriteLine("Invalid day of the week.");
             return;
@@ -117,8 +143,12 @@ public class Schedule
         Console.WriteLine("Would you like to edit the schedule? (yes/no)");
         if (Console.ReadLine().ToLower() == "yes")
         {
-            Console.WriteLine("Enter lesson time:");
-            string time = Console.ReadLine();
+            Console.WriteLine("Enter lesson start time (HH:mm):");
+            TimeSpan startTime;
+            while (!TimeSpan.TryParse(Console.ReadLine(), out startTime))
+            {
+                Console.WriteLine("Invalid time format. Please enter in HH:mm format.");
+            }
 
             Console.WriteLine("Enter lesson name:");
             string name = Console.ReadLine();
@@ -127,35 +157,47 @@ public class Schedule
             string teacher = Console.ReadLine();
 
             Console.WriteLine("Enter lesson difficulty (1-10):");
-            int difficulty = int.Parse(Console.ReadLine());
+            int difficulty;
+            while (!int.TryParse(Console.ReadLine(), out difficulty) || difficulty < 1 || difficulty > 10)
+            {
+                Console.WriteLine("Invalid difficulty. Enter a number between 1 and 10.");
+            }
 
-            try
+            var lesson = new Lesson(name, teacher, difficulty, startTime);
+            if (!ValidateSchedule(day, lesson))
             {
-                var lesson = new Lesson(name, teacher, difficulty, TimeSpan.FromMinutes(45));
-                AddOrUpdateLesson(day, time, lesson);
-                Console.WriteLine("Schedule updated!");
+                Console.WriteLine("Time conflict detected! Choose a different time.");
+                return;
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
+
+            AddOrUpdateLesson(day, lesson);
+            Console.WriteLine("Schedule updated!");
         }
     }
 
-    public void AddOrUpdateLesson(string day, string time, Lesson lesson)
+    private bool ValidateSchedule(string day, Lesson newLesson)
+    {
+        if (!schedule.ContainsKey(day)) return true;
+
+        foreach (var lesson in schedule[day])
+        {
+            if (!(newLesson.EndTime <= lesson.StartTime || newLesson.StartTime >= lesson.EndTime))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public void AddOrUpdateLesson(string day, Lesson lesson)
     {
         day = new WeekDay().GetFormattedDay(day);
-        var lessonTime = new LessonTime(time);
         if (!schedule.ContainsKey(day))
-            schedule[day] = new List<(LessonTime, Lesson)>();
-
-        var existingLesson = schedule[day].FirstOrDefault(l => l.Item1.Time == time);
-        if (existingLesson != default)
         {
-            schedule[day].Remove(existingLesson);
+            schedule[day] = new List<Lesson>();
         }
-        schedule[day].Add((lessonTime, lesson));
-        schedule[day].Sort((x, y) => x.Item2.CompareTo(y.Item2)); // Sorting by difficulty
+        schedule[day].Add(lesson);
+        schedule[day].Sort();
         SaveToFile();
     }
 
@@ -168,7 +210,7 @@ public class Schedule
                 writer.WriteLine(day);
                 foreach (var lesson in schedule[day])
                 {
-                    writer.WriteLine($"{lesson.Item1.Time} {lesson.Item2.Name} {lesson.Item2.Teacher} {lesson.Item2.Difficulty} {lesson.Item2.Duration}");
+                    writer.WriteLine(lesson.StartTime + " " + lesson.Name + " " + lesson.Teacher + " " + lesson.Difficulty);
                 }
             }
         }
@@ -203,3 +245,4 @@ class Program
         }
     }
 }
+
